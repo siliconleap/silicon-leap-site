@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import ExperimentList from '../../components/ExperimentList.astro';
+import { t } from '../../i18n/ui';
+
+const lang = 'en' as const;
+const tr = t(lang);
+---
+
+<Base lang={lang} title={tr('site.title')} description={tr('site.tagline')} path="/">
+  <h1>{tr('site.title')}</h1>
+  <p class="tagline">{tr('site.tagline')}</p>
+  <h2>{tr('exp.index.title')}</h2>
+  <ExperimentList lang={lang} limit={10} />
+</Base>
+
+<style>
+  .tagline {
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+</style>

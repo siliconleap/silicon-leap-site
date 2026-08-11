@@ -1,0 +1,31 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../../layouts/Base.astro';
+import ExperimentArticle from '../../../components/ExperimentArticle.astro';
+import { experimentsFor } from '../../../lib/experiments';
+
+export const getStaticPaths = (async () => {
+  // 只为真的有英文版的实验生成 /en/ 页面。
+  // 没有英文版时不生成路由，语言切换按钮会置灰——避免出现"点进来还是中文"的假英文页。
+  const items = await experimentsFor('en');
+  return items
+    .filter((item) => !item.isFallback)
+    .map((item) => ({
+      params: { slug: item.slug },
+      props: item,
+    }));
+}) satisfies GetStaticPaths;
+
+const { slug, entry, isFallback, hasTranslation } = Astro.props;
+const lang = 'en' as const;
+---
+
+<Base
+  lang={lang}
+  title={entry.data.title}
+  description={entry.data.description ?? entry.data.question}
+  path={`/experiments/${slug}`}
+  hasTranslation={hasTranslation}
+>
+  <ExperimentArticle lang={lang} entry={entry} isFallback={isFallback} />
+</Base>

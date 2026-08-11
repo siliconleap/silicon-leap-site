@@ -1,0 +1,47 @@
+---
+import { t, localePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** 当前页在另一语言下的路径，不带语言前缀，如 "/experiments/foo"。 */
+  path: string;
+  /** 另一语言是否真的有内容。false 时按钮置灰，不给会 404 或回落的链接。 */
+  available?: boolean;
+}
+
+const { lang, path, available = true } = Astro.props;
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const tr = t(lang);
+---
+
+{
+  available ? (
+    <a class="lang-switch" href={localePath(other, path)} hreflang={other} lang={other}>
+      {tr('lang.switchTo')}
+    </a>
+  ) : (
+    <span class="lang-switch is-disabled" title={tr('lang.noTranslation')}>
+      {tr('lang.switchTo')}
+    </span>
+  )
+}
+
+<style>
+  .lang-switch {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--fg);
+    white-space: nowrap;
+  }
+  .lang-switch:hover {
+    background: var(--surface);
+  }
+  .is-disabled {
+    color: var(--muted);
+    border-style: dashed;
+    cursor: not-allowed;
+  }
+</style>

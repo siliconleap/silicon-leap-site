@@ -1,0 +1,92 @@
+---
+import { t, localePath, type Lang } from '../i18n/ui';
+import LangSwitch from '../components/LangSwitch.astro';
+import '../styles/global.css';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  /** 当前页的语言无关路径，用于语言切换与 hreflang */
+  path: string;
+  /** 另一语言是否有内容 */
+  hasTranslation?: boolean;
+}
+
+const { lang, title, description, path, hasTranslation = true } = Astro.props;
+const tr = t(lang);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const canonical = new URL(localePath(lang, path), Astro.site);
+---
+
+<!doctype html>
+<html lang={lang === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title === tr('site.title') ? title : `${title} · ${tr('site.title')}`}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    {
+      hasTranslation && (
+        <link rel="alternate" hreflang={other} href={new URL(localePath(other, path), Astro.site)} />
+      )
+    }
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href={localePath(lang, '/')}>{tr('site.title')}</a>
+      <nav>
+        <a href={localePath(lang, '/experiments')}>{tr('nav.experiments')}</a>
+        <LangSwitch lang={lang} path={path} available={hasTranslation} />
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <span>{tr('site.title')} · Silicon Leap</span>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+  .brand {
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-decoration: none;
+    color: var(--fg);
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  nav a:hover {
+    color: var(--fg);
+  }
+  .site-footer {
+    margin-top: 4rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+</style>

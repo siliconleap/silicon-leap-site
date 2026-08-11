@@ -1,0 +1,78 @@
+---
+import { t, localePath, defaultLang, type Lang } from '../i18n/ui';
+import { experimentsFor } from '../lib/experiments';
+
+interface Props {
+  lang: Lang;
+  /** 只显示最近 N 条，不传则全部 */
+  limit?: number;
+}
+
+const { lang, limit } = Astro.props;
+const tr = t(lang);
+const all = await experimentsFor(lang);
+const items = limit ? all.slice(0, limit) : all;
+const dateFormat = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+
+{items.length === 0 && <p class="empty">{tr('exp.empty')}</p>}
+
+<ul class="exp-list">
+  {
+    items.map((item) => (
+      <li>
+        {/* 该语言没有原生版本时，直接指向默认语言的页面——/en/ 下不会生成假英文页 */}
+        <a href={localePath(item.isFallback ? defaultLang : lang, `/experiments/${item.slug}`)}>
+          {item.entry.data.title}
+        </a>
+        {item.isFallback && <span class="badge">{lang === 'en' ? '中文' : 'EN'}</span>}
+        <p class="question">{item.entry.data.question}</p>
+        <time datetime={item.entry.data.date.toISOString()}>
+          {dateFormat.format(item.entry.data.date)}
+        </time>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .exp-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .exp-list li {
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .exp-list a {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .exp-list a:hover {
+    text-decoration: underline;
+  }
+  .question {
+    margin: 0.3rem 0 0.4rem;
+    color: var(--muted);
+  }
+  .badge {
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.05rem 0.45rem;
+    vertical-align: middle;
+  }
+  time,
+  .empty {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+</style>

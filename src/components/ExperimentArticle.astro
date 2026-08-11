@@ -1,0 +1,69 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { t, localePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  entry: CollectionEntry<'experiments'>;
+  /** 展示的是回落到默认语言的内容 */
+  isFallback?: boolean;
+}
+
+const { lang, entry, isFallback = false } = Astro.props;
+const tr = t(lang);
+const { Content } = await render(entry);
+const dateFormat = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<article>
+  <h1>{entry.data.title}</h1>
+  <p class="meta">
+    <time datetime={entry.data.date.toISOString()}>{dateFormat.format(entry.data.date)}</time>
+    {entry.data.tags.length > 0 && <span>· {entry.data.tags.join(' · ')}</span>}
+  </p>
+
+  <p class="question"><strong>{tr('exp.question')}</strong>：{entry.data.question}</p>
+
+  {
+    isFallback && (
+      <p class="fallback-note">
+        {lang === 'en'
+          ? 'This entry has no English version yet — showing the Chinese original.'
+          : '本篇暂无中文版，显示英文原文。'}
+      </p>
+    )
+  }
+
+  <Content />
+
+  <p class="back"><a href={localePath(lang, '/experiments')}>{tr('back')}</a></p>
+</article>
+
+<style>
+  .meta {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 0.4rem;
+  }
+  .question {
+    background: var(--surface);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+  .fallback-note {
+    font-size: 0.9rem;
+    color: var(--muted);
+    border: 1px dashed var(--border);
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+  }
+  .back {
+    margin-top: 3rem;
+    font-size: 0.9rem;
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import ExperimentArticle from '../../components/ExperimentArticle.astro';
+import { experimentsFor } from '../../lib/experiments';
+
+export const getStaticPaths = (async () => {
+  const items = await experimentsFor('zh');
+  return items.map((item) => ({
+    params: { slug: item.slug },
+    props: item,
+  }));
+}) satisfies GetStaticPaths;
+
+const { slug, entry, isFallback, hasTranslation } = Astro.props;
+const lang = 'zh' as const;
+---
+
+<Base
+  lang={lang}
+  title={entry.data.title}
+  description={entry.data.description ?? entry.data.question}
+  path={`/experiments/${slug}`}
+  hasTranslation={hasTranslation}
+>
+  <ExperimentArticle lang={lang} entry={entry} isFallback={isFallback} />
+</Base>
