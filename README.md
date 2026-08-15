@@ -31,25 +31,59 @@ frontmatter 字段见 `src/content.config.ts`，写错字段构建会直接失�
 
 ```bash
 npm install
-npm run dev      # http://localhost:4321
-npm run build    # 输出到 dist/
+npm run dev      # 开发预览：http://localhost:4321
+npm run check    # Astro/TypeScript 检查
+npm run build    # 生产构建，输出到 dist/
 ```
 
 `draft: true` 的条目在 `dev` 下可见，`build` 时排除。
 
+## 预览与发布
+
+日常改内容或样式时，可以先用本地开发服务器：
+
+```bash
+npm run dev
+```
+
+提交前建议本地跑一次检查和生产构建：
+
+```bash
+npm run check
+npm run build
+```
+
+如果要在本地看生产构建产物，再运行：
+
+```bash
+npm run preview
+```
+
+更推荐的发布前预览流程是走真实环境：
+
+1. 新建内容分支，例如 `content/2026-08-new-experiment`；或由 `siliconleap/silicon-leap-lab` 的 `Publish Site Draft` Action 自动创建 site PR
+2. 提交并 push 到 GitHub
+3. GitHub Actions 会运行 `.github/workflows/cloudflare-pages.yml`
+4. Action 通过后，Cloudflare Pages 会生成这个分支对应的公网 preview URL
+5. 检查 preview URL 没问题后，再合并到主分支发布正式站点
+
+发布前建议检查首页、实验列表、至少一篇中文文章、一篇英文文章，以及只有中文版本的文章语言切换是否置灰。
+
 ## 部署到 Cloudflare Pages
 
-1. 把本目录推到一个 GitHub 仓库
-2. Cloudflare Dashboard → Workers & Pages → Create → Pages → 连接该仓库
-3. 构建配置：
-   - Framework preset: `Astro`
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-   - 环境变量 `NODE_VERSION` = `22`（或更高）
-4. 绑定自定义域名后，把 `astro.config.mjs` 里的 `site` 改成正式域名
-   （它决定 canonical 和 hreflang 的绝对地址）
+这个仓库用 GitHub Actions 部署 Cloudflare Pages，不依赖 Cloudflare Dashboard 的 Git 集成。
 
-每个 PR 会自动生成 preview 部署，push 到主分支即上线。
+1. 在 Cloudflare Pages 创建项目，记录项目名和 Account ID
+2. 创建 Cloudflare API Token，至少需要 Cloudflare Pages 部署权限
+3. 在 GitHub 仓库 `siliconleap/silicon-leap-site` 配置：
+   - Secret `CLOUDFLARE_API_TOKEN`
+   - Secret `CLOUDFLARE_ACCOUNT_ID`
+   - Variable `CLOUDFLARE_PAGES_PROJECT_NAME`
+4. 在 Cloudflare Pages 项目设置里确认 production branch（通常是 `main`）
+5. push 到非 production branch 会生成分支 preview 部署
+6. push 或合并到 production branch 会更新生产部署
+7. 绑定自定义域名后，把 `astro.config.mjs` 里的 `site` 改成正式域名
+   （它决定 canonical 和 hreflang 的绝对地址）
 
 ## 还没做
 
