@@ -23,5 +23,5 @@ const lang = 'zh' as const;
   path={`/experiments/${slug}`}
   hasTranslation={hasTranslation}
 >
-  <ExperimentArticle lang={lang} entry={entry} isFallback={isFallback} />
+  <ExperimentArticle lang={lang} entry={entry} path={`/experiments/${slug}`} isFallback={isFallback} />
 </Base>

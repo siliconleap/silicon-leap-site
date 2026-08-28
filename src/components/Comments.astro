@@ -1,0 +1,65 @@
+---
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** 语言无关的文章路径，如 /experiments/foo */
+  path: string;
+}
+
+const { lang, path } = Astro.props;
+
+// 未配置服务端地址时整块不渲染，本地开发与首次构建不会因此报错。
+// 注意：PUBLIC_ 变量在构建时被内联，必须配置在 Cloudflare Pages 的构建环境变量里。
+const serverURL = import.meta.env.PUBLIC_WALINE_SERVER_URL;
+
+// zh 与 en 是不同内容，各自独立的评论串。去掉结尾斜杠，
+// 避免 /foo 与 /foo/ 被当成两篇文章而评论分家。
+const commentPath = (lang === 'zh' ? path : `/${lang}${path}`).replace(/\/+$/, '');
+const walineLang = lang === 'zh' ? 'zh-CN' : 'en';
+---
+
+{
+  serverURL && (
+    <section class="comments">
+      <h2>{lang === 'zh' ? '评论' : 'Comments'}</h2>
+      <div
+        id="waline"
+        data-server-url={serverURL}
+        data-path={commentPath}
+        data-lang={walineLang}
+      />
+    </section>
+  )
+}
+
+<script>
+  // 动态引入：未配置 serverURL 时页面上没有 #waline，
+  // Waline 的 JS/CSS（约 200KB）就完全不会被下载。
+  const el = document.querySelector<HTMLElement>('#waline');
+  if (el) {
+    const [{ init }] = await Promise.all([
+      import('@waline/client/full'),
+      import('@waline/client/style'),
+    ]);
+    init({
+      el,
+      serverURL: el.dataset.serverUrl!,
+      path: el.dataset.path,
+      lang: el.dataset.lang,
+      dark: 'auto',
+    });
+  }
+</script>
+
+<style>
+  .comments {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .comments h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+</style>

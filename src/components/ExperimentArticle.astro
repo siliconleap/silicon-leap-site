@@ -1,15 +1,18 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import { t, localePath, type Lang } from '../i18n/ui';
+import Comments from './Comments.astro';
 
 interface Props {
   lang: Lang;
   entry: CollectionEntry<'experiments'>;
+  /** 语言无关的文章路径，如 /experiments/foo */
+  path: string;
   /** 展示的是回落到默认语言的内容 */
   isFallback?: boolean;
 }
 
-const { lang, entry, isFallback = false } = Astro.props;
+const { lang, entry, path, isFallback = false } = Astro.props;
 const tr = t(lang);
 const { Content } = await render(entry);
 const dateFormat = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en-US', {
@@ -41,6 +44,8 @@ const dateFormat = new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en-US', {
   <Content />
 
   <p class="back"><a href={localePath(lang, '/experiments')}>{tr('back')}</a></p>
+
+  <Comments lang={lang} path={path} />
 </article>
 
 <style>
