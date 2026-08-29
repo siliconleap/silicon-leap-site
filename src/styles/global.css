@@ -95,3 +95,19 @@ td {
   padding: 0.5rem 0.75rem;
   text-align: left;
 }
+
+/* 文章里的图片按原始像素宽度渲染会撑破正文栏宽。
+   height:auto 是必须的——Astro 会给图片加上 width/height 属性，
+   只限制宽度会让图片被纵向拉伸。 */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 图片在 Markdown 里会被包进 <p>，去掉行内元素的基线间隙 */
+img {
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 8px;
+}
