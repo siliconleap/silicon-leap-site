@@ -9,5 +9,15 @@ const tr = t(lang);
 
 <Base lang={lang} title={tr('exp.index.title')} path="/experiments">
   <h1>{tr('exp.index.title')}</h1>
+  <p class="intro">{tr('exp.index.intro')}</p>
   <ExperimentList lang={lang} />
 </Base>
+
+<style>
+  .intro {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+</style>

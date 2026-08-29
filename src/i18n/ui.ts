@@ -14,6 +14,8 @@ export const ui = {
     'nav.home': '首页',
     'nav.experiments': '实验',
     'exp.index.title': '实验',
+    'exp.index.intro':
+      '关于 AI 能做什么，说法很多，吹得天花乱坠。但真正情况如何，得实操看看。这里就是一个个实验，记录预期、过程以及结论，包括那些没走通的。',
     'exp.question': '问题',
     'exp.empty': '还没有已发布的实验。',
     'lang.noTranslation': '暂无英文版',
@@ -26,6 +28,8 @@ export const ui = {
     'nav.home': 'Home',
     'nav.experiments': 'Experiments',
     'exp.index.title': 'Experiments',
+    'exp.index.intro':
+      'There is no shortage of talk about what AI can do, most of it hype. What actually holds up has to be tried. So here are the experiments, one at a time, recording the expectation, the process and the conclusion — including the ones that did not work out.',
     'exp.question': 'Question',
     'exp.empty': 'No published experiments yet.',
     'lang.noTranslation': 'No Chinese version',
