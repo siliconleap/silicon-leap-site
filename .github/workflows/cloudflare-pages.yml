@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - '**'
+  # 允许在 Actions 页面手动触发，用于改了仓库变量后重新构建部署
+  workflow_dispatch:
 
 concurrency:
   group: pages-${{ github.ref }}
@@ -34,6 +36,9 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # 构建时内联进静态页面；未配置时评论区不渲染
+          PUBLIC_WALINE_SERVER_URL: ${{ vars.PUBLIC_WALINE_SERVER_URL }}
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
